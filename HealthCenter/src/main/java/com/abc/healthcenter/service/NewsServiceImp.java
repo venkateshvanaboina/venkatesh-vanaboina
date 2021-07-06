@@ -39,8 +39,12 @@ public class NewsServiceImp implements NewsService {
      */
 	@Override
 	public void saveNews(News news) throws ResourceAlreadyExistException {
+		
+		LOGGER.info("newsRepository::findbyId(int id) method called");
+		
 		Optional<NewsEntity> newsEntity1 = newsRepository.findById(news.getNewsId());
 		if(newsEntity1.isPresent()) {
+			LOGGER.error("ResourceAlreadyExistException encountered with id"+news.getNewsId());
 		throw new ResourceAlreadyExistException("News is already exist with this Id"+news.getNewsId());
 
 	}
@@ -52,33 +56,44 @@ public class NewsServiceImp implements NewsService {
 		adminEntity.setAdminId(optionalEntity.get().getAdminId());
 		
 		newsRepository.save(newsEntity);
+		LOGGER.info("News details saved in repository");
 	
 	}
-		
+		LOGGER.info("Exiting from NewsServiceImp::saveNews(News news)method");
 	}
 	/**
+	 * implements deleteNewsbyId from NewsService interface
      * {@inheritDoc}
      */
 	@Override
 	public void deleteNewsbyId(int id) throws ResourceNotFoundException {
+		
+		LOGGER.info("FindById method called from NewserviceImp::deleteNewsbyId method");
+		
 		Optional<NewsEntity> newsEntity = newsRepository.findById(id);
 		if(newsEntity.isPresent()) {
 			newsRepository.deleteById(id);
+			LOGGER.info("DELETED the given News Details");
 		}
 		else {
-			
+			LOGGER.error("ResourceNotFoundException encountered with id "+id);
 			throw new ResourceNotFoundException ("can not find News with this Id "+id);
 		}
-
+		LOGGER.info("Exiting from NewsServiceImp::deleteNewsbyId(int id)method");
 	}
 	/**
+	 * implements uopdateNewsbyId from NewsService interface
      * {@inheritDoc}
      */
 	@Override
 	public void updateNewsbyId(News news) throws ResourceNotFoundException {
 		
+		LOGGER.info("FindById method called from NewsServiceImp::updateNewsbyId method");
+		
 		NewsEntity newsEntity =newsRepository.findById(news.getNewsId()).get();
 		if(newsEntity == null) {
+			LOGGER.error("ResourceNotFoundException encountered with id "+news.getNewsId());
+			
 			throw new ResourceNotFoundException ("can not find News with this Id"+news.getNewsId());
 			
 		}
@@ -89,19 +104,29 @@ public class NewsServiceImp implements NewsService {
 			newsEntity.setNewsContact(news.getNewsContact());
 			newsEntity.setNewsDate(LocalDate.parse(news.getNewsDate()));
 			newsRepository.save(newsEntity);
+			LOGGER.info("News Details are updated");
 		}
-
+		LOGGER.info("Exiting from NewsServiceImp::updateNewsbyId(News news)method ");
 	}
+	
+	/**
+	 * implements findNewsbyId from DoctorService interface
+	 * {@inheritDoc}
+	 */
 	@Override
 	public News findNewsbyId(int id) throws ResourceNotFoundException {
+		
+		LOGGER.info("newsRepository::findbyId method calling from NewsService::FindNewsbyId");
 		
 		Optional<NewsEntity> newsEntity = newsRepository.findById(id);
 		if(newsEntity.isPresent()) {
 			
 			News news = convertEntitytoModel(newsEntity);
+			LOGGER.info("returned news object to Newscontroller::findnews(int id) method");
 			return news;
 		}
 		else {
+			LOGGER.error("ResourceNotFoundException encounterd with Id" +id);
 			throw new ResourceNotFoundException("can not find news with this id "+id);
 		}
 	}
